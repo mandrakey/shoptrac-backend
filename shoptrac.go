@@ -104,7 +104,7 @@ func runServe(ctx *cli.Context) error {
 			m.Options("/*", handler.OptionsCategory)
 		})
 		m.Group("/purchases", func() {
-			m.Get("/:year(\\d{4})/:month(\\d{2})", handler.GetPurchases)
+			m.Get("/:year(\\d{4})/:month(\\d{1,2})", handler.GetPurchases)
 			m.Put("/", handler.PutPurchase)
 			m.Post("/:key", handler.PostPurchase)
 			m.Delete("/:key", handler.DeletePurchase)
