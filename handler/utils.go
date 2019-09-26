@@ -25,12 +25,8 @@ func ErrorResponseWithData(message string, data interface{}) string {
 }
 
 func SuccessResponse(data interface{}) string {
-	obj := map[string]interface{}{
-		"data": data,
-	}
-
-	res, err := json.Marshal(obj); if err != nil {
-		config.Logger().Errorf("Failes to generate success response: %s", err)
+	res, err := json.Marshal(data); if err != nil {
+		config.Logger().Errorf("Failed to generate success response: %s", err)
 		return ""
 	}
 
