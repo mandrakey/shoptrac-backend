@@ -90,18 +90,27 @@ func runServe(ctx *cli.Context) error {
 			m.Put("/", handler.PutVenue)
 			m.Post("/:key", handler.PostVenue)
 			m.Delete("/:key", handler.DeleteVenue)
+			
+			m.Options("/", handler.OptionsVenue)
+			m.Options("/*", handler.OptionsVenue)
 		})
 		m.Group("/categories", func() {
 			m.Get("/", handler.GetCategories)
 			m.Put("/", handler.PutCategory)
 			m.Post("/:key", handler.PostCategory)
 			m.Delete("/:key", handler.DeleteCategory)
+			
+			m.Options("/", handler.OptionsCategory)
+			m.Options("/*", handler.OptionsCategory)
 		})
 		m.Group("/purchases", func() {
 			m.Get("/:year(\\d{4})/:month(\\d{2})", handler.GetPurchases)
 			m.Put("/", handler.PutPurchase)
 			m.Post("/:key", handler.PostPurchase)
 			m.Delete("/:key", handler.DeletePurchase)
+			
+			m.Options("/", handler.OptionsPurchase)
+			m.Options("/*", handler.OptionsPurchase)
 		})
 		m.Get("/version", handler.GetVersion)
 	})

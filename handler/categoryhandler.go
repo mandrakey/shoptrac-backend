@@ -99,3 +99,15 @@ func DeleteCategory(ctx *macaron.Context) (int, string) {
 	}
 	return 200, SuccessResponse(nil)
 }
+
+func OptionsCategory(ctx *macaron.Context) (int, string) {
+	ctx.Resp.Header().Add(
+		"Access-Control-Allow-Methods",
+		"GET, POST, PUT, DELETE, OPTIONS",
+	)
+	ctx.Resp.Header().Add(
+		"Access-Control-Allow-Headers",
+		"Content-Type",
+	)
+	return 200, ""
+}
