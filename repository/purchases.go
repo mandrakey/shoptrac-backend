@@ -13,8 +13,8 @@ const (
 
 type Purchase struct {
 	Key string `json:"_key"`
-	Category int `json:"category"`
-	Venue int `json:"venue"`
+	Category string `json:"category"`
+	Venue string `json:"venue"`
 	Date string `json:"date"`
 	Month int `json:"month"`
 	Year int `json:"year"`

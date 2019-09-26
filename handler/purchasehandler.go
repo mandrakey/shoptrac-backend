@@ -56,13 +56,13 @@ func PutPurchase(ctx *macaron.Context) (int, string) {
 
 	purchase := repository.Purchase{}
 
-	category, ok := data["category"].(int); if !ok {
-		return 400, ErrorResponse("Parameter 'category' is required and must be a number")
+	category, ok := data["category"].(string); if !ok {
+		return 400, ErrorResponse("Parameter 'category' is required and must be a string")
 	}
 	purchase.Category = category
 
-	venue, ok := data["venue"].(int); if !ok {
-		return 400, ErrorResponse("Parameter 'venue' is required and must be a number")
+	venue, ok := data["venue"].(string); if !ok {
+		return 400, ErrorResponse("Parameter 'venue' is required and must be a string")
 	}
 	purchase.Venue = venue
 
@@ -74,15 +74,15 @@ func PutPurchase(ctx *macaron.Context) (int, string) {
 	}
 	purchase.Date = date
 
-	month, ok := data["month"].(int); if !ok {
+	month, ok := data["month"].(float64); if !ok {
 		return 400, ErrorResponse("Parameter 'month' is required and must be a number")
 	}
-	purchase.Month = month
+	purchase.Month = int(month)
 
-	year, ok := data["year"].(int); if !ok {
+	year, ok := data["year"].(float64); if !ok {
 		return 400, ErrorResponse("Parameter 'year' is required and must be a number")
 	}
-	purchase.Year = year
+	purchase.Year = int(year)
 
 	sum, ok := data["sum"].(string); if !ok {
 		return 400, ErrorResponse("Parameter 'sum' is required and must be a string")
@@ -121,16 +121,16 @@ func PostPurchase(ctx *macaron.Context) (int, string) {
 
 	// category
 	if data["category"] != nil {
-		category, ok := data["category"].(int); if !ok {
-			return 400, ErrorResponse("The parameter 'category' must be a number")
+		category, ok := data["category"].(string); if !ok {
+			return 400, ErrorResponse("The parameter 'category' must be a string")
 		}
 		values["category"] = category
 	}
 
 	// venue
 	if data["venue"] != nil {
-		venue, ok := data["venue"].(int); if !ok {
-			return 400, ErrorResponse("The parameter 'venue' must be a number")
+		venue, ok := data["venue"].(string); if !ok {
+			return 400, ErrorResponse("The parameter 'venue' must be a string")
 		}
 		values["venue"] = venue
 	}
@@ -148,18 +148,18 @@ func PostPurchase(ctx *macaron.Context) (int, string) {
 	
 	// month
 	if data["month"] != nil {
-		month, ok := data["month"].(int); if !ok {
+		month, ok := data["month"].(float64); if !ok {
 			return 400, ErrorResponse("The parameter 'month' must be a number")
 		}
-		values["month"] = month
+		values["month"] = int(month)
 	}
 
 	// year
 	if data["year"] != nil {
-		year, ok := data["year"].(int); if !ok {
+		year, ok := data["year"].(float64); if !ok {
 			return 400, ErrorResponse("The parameter 'year' must be a number")
 		}
-		values["year"] = year
+		values["year"] = int(year)
 	}
 
 	// sum
