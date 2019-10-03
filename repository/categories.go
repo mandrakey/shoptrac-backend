@@ -51,9 +51,15 @@ func AddCategory(name string) (*Category, error) {
 		return nil, err
 	}
 
-	maxId, err := getMaxCategoryIdInt(); if err != nil {
+	// Get new category id
+	maxId, err := getMaxCategoryIdInt()
+	if arango.IsNoMoreDocuments(err) {
+		maxId = 0
+	} else if err != nil {
 		return nil, fmt.Errorf("failed to get highest current category id: %s", err)
 	}
+
+	// Create new Category and store
 	cat := Category{Key: fmt.Sprintf("%d", maxId + 1), Name: name}
 	_, err = col.CreateDocument(ctx, cat); if err != nil {
 		return nil, err

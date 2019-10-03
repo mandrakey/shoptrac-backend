@@ -52,12 +52,16 @@ func AddVenue(name string, image string) (*Venue, error) {
 		return nil, err
 	}
 
-	key, err := getMaxVenueIdInt(); if err != nil {
-		return nil, err
+	// Get new venue id
+	maxId, err := getMaxVenueIdInt()
+	if arango.IsNoMoreDocuments(err) {
+		maxId = 0
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to get current highest venue id: %s", err)
 	}
-	key += 1
 
-	v := Venue{Key: fmt.Sprintf("%d", key), Name: name, Image: image}
+	// Create Venue and store
+	v := Venue{Key: fmt.Sprintf("%d", maxId + 1), Name: name, Image: image}
 	_, err = col.CreateDocument(ctx, v); if err != nil {
 		return nil, err
 	}
