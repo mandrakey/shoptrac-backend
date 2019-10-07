@@ -112,6 +112,10 @@ func runServe(ctx *cli.Context) error {
 			m.Options("/", handler.OptionsPurchase)
 			m.Options("/*", handler.OptionsPurchase)
 		})
+		m.Group("/statistics", func() {
+			m.Get("/overview/:year(\\d{4})/:month(\\d{1,2})", handler.GetOverviewStatistics)
+			m.Options("/*", handler.OptionsStatistics)
+		})
 		m.Get("/version", handler.GetVersion)
 	})
 
