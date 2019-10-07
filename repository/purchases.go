@@ -31,7 +31,7 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 
 	c, err := db.Query(
 		ctx,
-		"FOR p IN purchases FILTER p.month == @month AND p.year == @year RETURN p",
+		"FOR p IN purchases FILTER p.month == @month AND p.year == @year SORT p.date DESC RETURN p",
 		map[string]interface{}{"month": month, "year": year},
 	)
 	defer c.Close()
