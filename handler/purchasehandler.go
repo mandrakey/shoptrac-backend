@@ -196,6 +196,15 @@ func DeletePurchase(ctx *macaron.Context) (int, string) {
 	return 200, SuccessResponse(nil)
 }
 
+func GetPurchaseTimestamps(ctx *macaron.Context) (int, string) {
+	stamps, err := repository.GetPurchaseTimestamps()
+	if err != nil {
+		return 500, ErrorResponse(err.Error())
+	}
+
+	return 200, SuccessResponse(stamps)
+}
+
 func OptionsPurchase(ctx *macaron.Context) (int, string) {
 	ctx.Resp.Header().Add(
 		"Access-Control-Allow-Methods",
