@@ -21,6 +21,11 @@ type Purchase struct {
 	Sum string `json:"sum"`
 }
 
+type PurchaseTimestamp struct {
+	Month int `json:"month"`
+	Year int `json:"year"`
+}
+
 func GetPurchases(month int, year int) (*[]Purchase, error) {
 	db, err := GetDb(); if err != nil {
 		return nil, err
@@ -48,6 +53,36 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 		}
 
 		res = append(res, p)
+	}
+
+	return &res, nil
+}
+
+func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {
+	db, err := GetDb();
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := db.Query(
+		ctx,
+		"FOR p IN purchases COLLECT dates = { month: p.month, year: p.year } SORT dates.year, dates.month RETURN dates",
+		nil,
+	)
+	defer c.Close()
+
+	res := make([]PurchaseTimestamp, c.Count())
+	for {
+		var t PurchaseTimestamp
+		_, err := c.ReadDocument(ctx, &t)
+
+		if (arango.IsNoMoreDocuments(err)) {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+
+		res = append(res, t)
 	}
 
 	return &res, nil

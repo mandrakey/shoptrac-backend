@@ -108,6 +108,8 @@ func runServe(ctx *cli.Context) error {
 			m.Put("/", handler.PutPurchase)
 			m.Post("/:key", handler.PostPurchase)
 			m.Delete("/:key", handler.DeletePurchase)
+
+			m.Get("/timestamps", handler.GetPurchaseTimestamps)
 			
 			m.Options("/", handler.OptionsPurchase)
 			m.Options("/*", handler.OptionsPurchase)
