@@ -17,7 +17,8 @@ func GetOverviewStatistics(ctx *macaron.Context) (int, string) {
 	if pmonth == "" {
 		return 400, ErrorResponse("Parameter 'month' is required and must be a number")
 	}
-	month, err := strconv.ParseInt(pmonth, 10, 0); if err != nil {
+	month, err := strconv.ParseInt(pmonth, 10, 0)
+	if err != nil {
 		return 400, ErrorResponse(fmt.Sprintf("Failed to parse month value: %s", err))
 	}
 
@@ -25,14 +26,25 @@ func GetOverviewStatistics(ctx *macaron.Context) (int, string) {
 	if pyear == "" {
 		return 400, ErrorResponse("Parameter 'year' is required and must be a number")
 	}
-	year, err := strconv.ParseInt(pyear, 10, 0); if err != nil {
+	year, err := strconv.ParseInt(pyear, 10, 0)
+	if err != nil {
 		return 400, ErrorResponse(fmt.Sprintf("Failed to parse year value: %s", err))
 	}
 
 	// ----
 	// Get data
 
-	stats, err := repository.GetOverviewStatistics(int(month), int(year)); if err != nil {
+	stats, err := repository.GetOverviewStatistics(int(month), int(year))
+	if err != nil {
+		return 500, ErrorResponse(err.Error())
+	}
+
+	return 200, SuccessResponse(stats)
+}
+
+func GetPurchasesUnfiltered(ctx *macaron.Context) (int, string) {
+	stats, err := repository.GetPurchasesUnfiltered()
+	if err != nil {
 		return 500, ErrorResponse(err.Error())
 	}
 

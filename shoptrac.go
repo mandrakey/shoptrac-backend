@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"net/http"
+	"os"
 
+	"github.com/go-macaron/session"
 	"github.com/urfave/cli"
 	"gopkg.in/macaron.v1"
-	"github.com/go-macaron/session"
 
 	"github.com/mandrakey/shoptrac/config"
 	"github.com/mandrakey/shoptrac/handler"
@@ -24,7 +24,7 @@ func main() {
 	app.Version = config.AppVersion
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "config, c",
+			Name:  "config, c",
 			Value: "./shoptrac.json",
 			Usage: "Load configuration from FILE",
 		},
@@ -33,16 +33,16 @@ func main() {
 	// Setup commands
 	app.Commands = []cli.Command{
 		{
-			Name: "serve",
-			Usage: "run the shoptrac API server",
+			Name:   "serve",
+			Usage:  "run the shoptrac API server",
 			Action: runServe,
 			Flags: []cli.Flag{
 				cli.IntFlag{
-					Name: "port",
+					Name:  "port",
 					Usage: "Run on PORT",
 				},
 				cli.StringFlag{
-					Name: "address",
+					Name:  "address",
 					Usage: "Run on ADDRESS",
 				},
 			},
@@ -50,7 +50,8 @@ func main() {
 	}
 
 	// Run
-	err := app.Run(os.Args); if err != nil {
+	err := app.Run(os.Args)
+	if err != nil {
 		fmt.Printf("ERROR %s\n", err)
 	}
 }
@@ -59,7 +60,8 @@ func runServe(ctx *cli.Context) error {
 	configFile := ctx.GlobalString("config")
 
 	cfg := config.GetAppConfig()
-	err := cfg.LoadFromFile(configFile); if err != nil {
+	err := cfg.LoadFromFile(configFile)
+	if err != nil {
 		return fmt.Errorf("Failed to load configuration: %s", err)
 	}
 	config.SetupLogging(cfg.Logfile, cfg.Loglevel)
@@ -90,7 +92,7 @@ func runServe(ctx *cli.Context) error {
 			m.Put("/", handler.PutVenue)
 			m.Post("/:key", handler.PostVenue)
 			m.Delete("/:key", handler.DeleteVenue)
-			
+
 			m.Options("/", handler.OptionsVenue)
 			m.Options("/*", handler.OptionsVenue)
 		})
@@ -99,7 +101,7 @@ func runServe(ctx *cli.Context) error {
 			m.Put("/", handler.PutCategory)
 			m.Post("/:key", handler.PostCategory)
 			m.Delete("/:key", handler.DeleteCategory)
-			
+
 			m.Options("/", handler.OptionsCategory)
 			m.Options("/*", handler.OptionsCategory)
 		})
@@ -110,12 +112,13 @@ func runServe(ctx *cli.Context) error {
 			m.Delete("/:key", handler.DeletePurchase)
 
 			m.Get("/timestamps", handler.GetPurchaseTimestamps)
-			
+
 			m.Options("/", handler.OptionsPurchase)
 			m.Options("/*", handler.OptionsPurchase)
 		})
 		m.Group("/statistics", func() {
 			m.Get("/overview/:year(\\d{4})/:month(\\d{1,2})", handler.GetOverviewStatistics)
+			m.Get("/purchases_unfiltered", handler.GetPurchasesUnfiltered)
 			m.Options("/*", handler.OptionsStatistics)
 		})
 		m.Get("/version", handler.GetVersion)
