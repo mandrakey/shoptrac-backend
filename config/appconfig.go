@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	AppVersion = "1.0.0-dev"
+	AppVersion = "2020.1.0"
 
 	AccessAllow = 1
 	AccessDeny = 0
