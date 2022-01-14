@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	arango "github.com/arangodb/go-driver"
-	"github.com/nu7hatch/gouuid"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 const (
@@ -12,22 +12,23 @@ const (
 )
 
 type Purchase struct {
-	Key string `json:"_key"`
+	Key      string `json:"_key"`
 	Category string `json:"category"`
-	Venue string `json:"venue"`
-	Date string `json:"date"`
-	Month int `json:"month"`
-	Year int `json:"year"`
-	Sum string `json:"sum"`
+	Venue    string `json:"venue"`
+	Date     string `json:"date"`
+	Month    int    `json:"month"`
+	Year     int    `json:"year"`
+	Sum      string `json:"sum"`
 }
 
 type PurchaseTimestamp struct {
 	Month int `json:"month"`
-	Year int `json:"year"`
+	Year  int `json:"year"`
 }
 
 func GetPurchases(month int, year int) (*[]Purchase, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return nil, err
 	}
 
@@ -63,7 +64,7 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 }
 
 func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {
-	db, err := GetDb();
+	db, err := GetDb()
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,7 @@ func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {
 		var t PurchaseTimestamp
 		_, err := c.ReadDocument(ctx, &t)
 
-		if (arango.IsNoMoreDocuments(err)) {
+		if arango.IsNoMoreDocuments(err) {
 			break
 		} else if err != nil {
 			return nil, err
@@ -93,16 +94,24 @@ func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {
 }
 
 func AddPurchase(purchase Purchase) (string, error) {
-	col, err := GetCollection(COLLECTION_PURCHASES); if err != nil {
+	col, err := GetCollection(COLLECTION_PURCHASES)
+	if err != nil {
 		return "", err
 	}
 
-	key, err := uuid.NewV4(); if err != nil {
+	key, err := uuid.NewV4()
+	if err != nil {
 		return "", fmt.Errorf("failed to generate uuid: %s", err)
 	}
 	purchase.Key = key.String()
 
-	_, err = col.CreateDocument(ctx, purchase); if err != nil {
+	err = validatePurchase(&purchase)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = col.CreateDocument(ctx, purchase)
+	if err != nil {
 		return "", err
 	}
 
@@ -110,7 +119,8 @@ func AddPurchase(purchase Purchase) (string, error) {
 }
 
 func UpdatePurchase(key string, data *map[string]interface{}) error {
-	col, err := GetCollection(COLLECTION_PURCHASES); if err != nil {
+	col, err := GetCollection(COLLECTION_PURCHASES)
+	if err != nil {
 		return err
 	}
 
@@ -119,7 +129,8 @@ func UpdatePurchase(key string, data *map[string]interface{}) error {
 }
 
 func DeletePurchase(key string) error {
-	col, err := GetCollection(COLLECTION_PURCHASES); if err != nil {
+	col, err := GetCollection(COLLECTION_PURCHASES)
+	if err != nil {
 		return err
 	}
 
