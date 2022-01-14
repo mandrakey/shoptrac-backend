@@ -3,10 +3,15 @@ module github.com/mandrakey/shoptrac
 go 1.12
 
 require (
-	github.com/arangodb/go-driver v0.0.0-20190917135832-4ec315b17bf0
-	github.com/go-macaron/session v0.0.0-20190805070824-1a3cdc6f5659
+	github.com/arangodb/go-driver v1.2.1
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/go-macaron/session v1.0.2
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
-	github.com/urfave/cli v1.22.1
-	gopkg.in/macaron.v1 v1.3.4
+	github.com/urfave/cli v1.22.5
+	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/ini.v1 v1.66.2 // indirect
+	gopkg.in/macaron.v1 v1.4.0
 )
