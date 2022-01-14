@@ -46,7 +46,11 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 		var p Purchase
 		_, err := c.ReadDocument(ctx, &p)
 
-		if (arango.IsNoMoreDocuments(err)) {
+		if p.Sum == "" {
+			p.Sum = "0.0"
+		}
+
+		if arango.IsNoMoreDocuments(err) {
 			break
 		} else if err != nil {
 			return nil, err
@@ -121,4 +125,27 @@ func DeletePurchase(key string) error {
 
 	_, err = col.RemoveDocument(ctx, key)
 	return err
+}
+
+func validatePurchase(p *Purchase) error {
+	if p.Key == "" {
+		return fmt.Errorf("Missing purchase key")
+	}
+	if p.Category == "" {
+		return fmt.Errorf("Missing purchase category")
+	}
+	if p.Venue == "" {
+		return fmt.Errorf("Missing purchase venue")
+	}
+	if p.Date == "" {
+		return fmt.Errorf("Missing purchase date")
+	}
+	if p.Month < 0 || p.Month > 12 {
+		return fmt.Errorf("Invalid purchase month '%d'", p.Month)
+	}
+	if p.Sum == "" {
+		return fmt.Errorf("Missing purchase sum")
+	}
+
+	return nil
 }
