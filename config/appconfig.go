@@ -1,25 +1,28 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
-	"encoding/json"
 )
 
 const (
 	AppVersion = "2020.1.0"
 
 	AccessAllow = 1
-	AccessDeny = 0
+	AccessDeny  = 0
 )
 
 type AccessLevel int
+
 func (l *AccessLevel) UnmarshalJSON(b []byte) error {
 	var str string
-	err := json.Unmarshal(b, &str); if err != nil {
+	err := json.Unmarshal(b, &str)
+	if err != nil {
 		return err
 	}
-	lvl, err := stringToAccessLevel(str); if err != nil {
+	lvl, err := stringToAccessLevel(str)
+	if err != nil {
 		return err
 	}
 
@@ -28,27 +31,29 @@ func (l *AccessLevel) UnmarshalJSON(b []byte) error {
 }
 
 type AppConfig struct {
-	Address string
-	Port int
-	Logfile string
-	Loglevel string
-	CorsOrigin string `json:"cors-origin"`
-	AccessPolicy AccessPolicy `json:"access-policy"`
-	Database Database
+	Address                 string
+	Port                    int
+	Logfile                 string
+	Loglevel                string
+	CorsOrigin              string       `json:"cors-origin"`
+	AccessPolicy            AccessPolicy `json:"access-policy"`
+	Database                Database
+	SessionExpiry           int
+	SessionRememberMeExpiry int
 }
 
 type Database struct {
-	Protocol string
-	Host string
-	Port int
-	User string
-	Password string
+	Protocol     string
+	Host         string
+	Port         int
+	User         string
+	Password     string
 	DatabaseName string `json:"database"`
 }
 
 type AccessPolicy struct {
 	Default AccessLevel
-	Rules []AccessRule
+	Rules   []AccessRule
 }
 
 type AccessRule struct {
@@ -61,22 +66,24 @@ var instance *AppConfig
 func GetAppConfig() *AppConfig {
 	if instance == nil {
 		instance = &AppConfig{
-			Address: "0.0.0.0",
-			Port: 7534,
-			Logfile: "./shoptrac.log",
-			Loglevel: "debug",
+			Address:    "0.0.0.0",
+			Port:       7534,
+			Logfile:    "./shoptrac.log",
+			Loglevel:   "debug",
 			CorsOrigin: "*",
 			AccessPolicy: AccessPolicy{
 				Default: AccessAllow,
-				Rules: nil,
+				Rules:   nil,
 			},
 			Database: Database{
-				Host: "localhost",
-				Port: 8529,
-				User: "dummy",
-				Password: "doof",
+				Host:         "localhost",
+				Port:         8529,
+				User:         "dummy",
+				Password:     "doof",
 				DatabaseName: "shoptrac",
 			},
+			SessionExpiry:           30,           // 30 minutes
+			SessionRememberMeExpiry: 60 * 24 * 30, // 30 days
 		}
 	}
 
@@ -88,13 +95,15 @@ func (c *AppConfig) LoadFromFile(filename string) error {
 		return fmt.Errorf("file %s does not exist", filename)
 	}
 
-	f, err := os.Open(filename); if err != nil {
+	f, err := os.Open(filename)
+	if err != nil {
 		return fmt.Errorf("failed to open file '%s': %s", filename, err)
 	}
 	defer f.Close()
 
 	decoder := json.NewDecoder(f)
-	err = decoder.Decode(c); if err != nil {
+	err = decoder.Decode(c)
+	if err != nil {
 		return fmt.Errorf("failed to decode file: %s", err)
 	}
 
@@ -102,7 +111,8 @@ func (c *AppConfig) LoadFromFile(filename string) error {
 }
 
 func (c *AppConfig) String() (string, error) {
-	res, err := json.Marshal(c); if err != nil {
+	res, err := json.Marshal(c)
+	if err != nil {
 		return "", fmt.Errorf("failed to encode AppConfig to JSON: %s", err)
 	}
 	return string(res), nil
@@ -115,7 +125,7 @@ func stringToAccessLevel(level string) (AccessLevel, error) {
 
 	case "deny":
 		return AccessDeny, nil
-		
+
 	default:
 		return -1, fmt.Errorf("unknown access level '%s'", level)
 	}

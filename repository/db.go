@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"fmt"
 	"context"
-	"strings"
+	"fmt"
 	"strconv"
+	"strings"
 
 	arango "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
@@ -18,7 +18,7 @@ const (
 
 var (
 	client arango.Client
-	ctx = context.Background()
+	ctx    = context.Background()
 )
 
 func GetDb() (arango.Database, error) {
@@ -35,7 +35,7 @@ func GetDb() (arango.Database, error) {
 		}
 
 		client, err = arango.NewClient(arango.ClientConfig{
-			Connection: conn,
+			Connection:     conn,
 			Authentication: arango.BasicAuthentication(cfg.Database.User, cfg.Database.Password),
 		})
 		if err != nil {
@@ -43,18 +43,21 @@ func GetDb() (arango.Database, error) {
 		}
 	}
 
-	db, err := client.Database(ctx, cfg.Database.DatabaseName); if err != nil {
+	db, err := client.Database(ctx, cfg.Database.DatabaseName)
+	if err != nil {
 		return nil, fmt.Errorf("failed to access database %s: %s", cfg.Database.DatabaseName, err)
 	}
 	return db, nil
 }
 
 func GetCollection(name string) (arango.Collection, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return nil, err
 	}
 
-	col, err := db.Collection(ctx, name); if err != nil {
+	col, err := db.Collection(ctx, name)
+	if err != nil {
 		return nil, err
 	}
 
@@ -62,54 +65,56 @@ func GetCollection(name string) (arango.Collection, error) {
 }
 
 func BuildFilterString(filters map[string]interface{}, prefix string) string {
-    f := make([]string, 0)
-    for field, rawValue := range(filters) {
-        value := rawValue.(string)
+	f := make([]string, 0)
+	for field, rawValue := range filters {
+		value := rawValue.(string)
 
-        // determine sign to use
-        frst := string(value[0])
-        sign := "=="
-        if frst == "!" {
-            sign = "!="
-            value = value[1:len(value)]
-        }
-        if frst == "<" || frst == ">" {
-            scnd := string(value[1])
-            if scnd == "=" {
-                sign = fmt.Sprintf("%s%s", frst, scnd)
-                value = strings.Trim(value[2:len(value)], " ")
-            } else {
-                sign = frst
-                value = strings.Trim(value[1:len(value)], " ")
-            }
-        }
-        filters[field] = value
+		// determine sign to use
+		frst := string(value[0])
+		sign := "=="
+		if frst == "!" {
+			sign = "!="
+			value = value[1:len(value)]
+		}
+		if frst == "<" || frst == ">" {
+			scnd := string(value[1])
+			if scnd == "=" {
+				sign = fmt.Sprintf("%s%s", frst, scnd)
+				value = strings.Trim(value[2:len(value)], " ")
+			} else {
+				sign = frst
+				value = strings.Trim(value[1:len(value)], " ")
+			}
+		}
+		filters[field] = value
 
-        // determine value type
-        if value == "null" {
-            f = append(f, fmt.Sprintf("%s%s %s null", prefix, field, sign))
-            continue
-        }
-        vint, err := strconv.ParseInt(value, 0, 0); if err == nil {
-            f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
-            filters[field] = vint
-            continue
-        }
-        vfloat, err := strconv.ParseFloat(value, 32); if err == nil {
-            f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
-            filters[field] = vfloat
-            continue
-        }
+		// determine value type
+		if value == "null" {
+			f = append(f, fmt.Sprintf("%s%s %s null", prefix, field, sign))
+			continue
+		}
+		vint, err := strconv.ParseInt(value, 0, 0)
+		if err == nil {
+			f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
+			filters[field] = vint
+			continue
+		}
+		vfloat, err := strconv.ParseFloat(value, 32)
+		if err == nil {
+			f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
+			filters[field] = vfloat
+			continue
+		}
 
-        //----
-        // string value
+		//----
+		// string value
 
-        // wildcard?
-        if strings.ContainsAny(value, "%_") {
-            sign = "LIKE"
-        }
-        f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
-    }
+		// wildcard?
+		if strings.ContainsAny(value, "%_") {
+			sign = "LIKE"
+		}
+		f = append(f, fmt.Sprintf("%s%s %s @%s", prefix, field, sign, field))
+	}
 
-    return strings.Join(f, " AND ")
+	return strings.Join(f, " AND ")
 }

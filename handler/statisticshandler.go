@@ -10,6 +10,10 @@ import (
 )
 
 func GetOverviewStatistics(ctx *macaron.Context) (int, string) {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
 	// ----
 	// Get month and year parameters
 
@@ -43,6 +47,10 @@ func GetOverviewStatistics(ctx *macaron.Context) (int, string) {
 }
 
 func GetPurchasesUnfiltered(ctx *macaron.Context) (int, string) {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
 	stats, err := repository.GetPurchasesUnfiltered()
 	if err != nil {
 		return 500, ErrorResponse(err.Error())
@@ -58,7 +66,7 @@ func OptionsStatistics(ctx *macaron.Context) (int, string) {
 	)
 	ctx.Resp.Header().Add(
 		"Access-Control-Allow-Headers",
-		"Content-Type",
+		"Content-Type, Authentication",
 	)
 	return 200, ""
 }

@@ -1,16 +1,21 @@
 package handler
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"gopkg.in/macaron.v1"
 
 	"github.com/mandrakey/shoptrac/repository"
 )
 
-func GetCategories() (int, string) {
-	categories, err := repository.GetCategories(); if err != nil {
+func GetCategories(ctx *macaron.Context) (int, string) {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
+	categories, err := repository.GetCategories()
+	if err != nil {
 		return 500, ErrorResponse(err.Error())
 	}
 
@@ -18,26 +23,34 @@ func GetCategories() (int, string) {
 }
 
 func PutCategory(ctx *macaron.Context) (int, string) {
-	body, err := ctx.Req.Body().Bytes(); if err != nil {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
+	body, err := ctx.Req.Body().Bytes()
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to read request: %s", err))
 	}
 
 	var data map[string]interface{}
-	err = json.Unmarshal(body, &data); if err != nil {
+	err = json.Unmarshal(body, &data)
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to parse JSON: %s", err))
 	}
 
 	// ----
 	// Extract name
 
-	name, ok := data["name"].(string); if !ok {
+	name, ok := data["name"].(string)
+	if !ok {
 		return 400, ErrorResponse("Parameter 'name' is required and must be a string")
 	}
 
 	//----
 	// Create category
 
-	category, err := repository.AddCategory(name); if err != nil {
+	category, err := repository.AddCategory(name)
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to add category: %s", err))
 	}
 
@@ -45,16 +58,23 @@ func PutCategory(ctx *macaron.Context) (int, string) {
 }
 
 func PostCategory(ctx *macaron.Context) (int, string) {
-	key := ctx.Params(":key"); if key == "" {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
+	key := ctx.Params(":key")
+	if key == "" {
 		return 400, ErrorResponse("No category key specified")
 	}
 
-	body, err := ctx.Req.Body().Bytes(); if err != nil {
+	body, err := ctx.Req.Body().Bytes()
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to read request: %s", err))
 	}
 
 	var data map[string]interface{}
-	err = json.Unmarshal(body, &data); if err != nil {
+	err = json.Unmarshal(body, &data)
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to parse JSON: %s", err))
 	}
 
@@ -65,7 +85,8 @@ func PostCategory(ctx *macaron.Context) (int, string) {
 
 	// name
 	if data["name"] != nil {
-		name, ok := data["name"].(string); if !ok {
+		name, ok := data["name"].(string)
+		if !ok {
 			return 400, ErrorResponse("The parameter 'name' must be a string")
 		}
 		if name == "" {
@@ -82,7 +103,8 @@ func PostCategory(ctx *macaron.Context) (int, string) {
 	// ----
 	// Execute the update
 
-	err = repository.UpdateCategory(key, &values); if err != nil {
+	err = repository.UpdateCategory(key, &values)
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to update category: %s", err))
 	}
 
@@ -90,11 +112,17 @@ func PostCategory(ctx *macaron.Context) (int, string) {
 }
 
 func DeleteCategory(ctx *macaron.Context) (int, string) {
-	key := ctx.Params(":key"); if key == "" {
+	if !IsValidSession(ctx) {
+		return UnauthorizedResponse()
+	}
+
+	key := ctx.Params(":key")
+	if key == "" {
 		return 400, ErrorResponse("No category key specified")
 	}
 
-	err := repository.DeleteCategory(key); if err != nil {
+	err := repository.DeleteCategory(key)
+	if err != nil {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to delete category: %s", err))
 	}
 	return 200, SuccessResponse(nil)
@@ -107,7 +135,7 @@ func OptionsCategory(ctx *macaron.Context) (int, string) {
 	)
 	ctx.Resp.Header().Add(
 		"Access-Control-Allow-Headers",
-		"Content-Type",
+		"Content-Type, Authentication",
 	)
 	return 200, ""
 }

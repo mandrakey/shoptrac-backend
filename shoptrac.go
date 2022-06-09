@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-macaron/session"
 	"github.com/urfave/cli"
 	"gopkg.in/macaron.v1"
 
 	"github.com/mandrakey/shoptrac/config"
 	"github.com/mandrakey/shoptrac/handler"
+	"github.com/mandrakey/shoptrac/middleware"
 )
 
 var (
@@ -77,9 +77,7 @@ func runServe(ctx *cli.Context) error {
 	// Create server and set routing
 	m := macaron.Classic()
 	m.Use(config.IpFilterer(cfg))
-	m.Use(session.Sessioner(session.Options{
-		CookieName: "shoptrac_session",
-	}))
+	m.Use(middleware.SessionMiddleware())
 	m.Use(func(ctx *macaron.Context) {
 		ctx.Resp.Header().Add("Access-Control-Allow-Origin", cfg.CorsOrigin)
 	})
@@ -120,6 +118,12 @@ func runServe(ctx *cli.Context) error {
 			m.Get("/overview/:year(\\d{4})/:month(\\d{1,2})", handler.GetOverviewStatistics)
 			m.Get("/purchases_unfiltered", handler.GetPurchasesUnfiltered)
 			m.Options("/*", handler.OptionsStatistics)
+		})
+		m.Group("/auth", func() {
+			m.Get("/logout", handler.GetLogout)
+			m.Post("/login", handler.PostLogin)
+			m.Post("/continue", handler.PostContinue)
+			m.Options("/*", handler.OptionsAuth)
 		})
 		m.Get("/version", handler.GetVersion)
 	})
