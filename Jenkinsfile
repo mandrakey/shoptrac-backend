@@ -10,7 +10,9 @@ pipeline {
             }
         }
         stage('Deploy to production') {
-            sshPublisher(publishers: [sshPublisherDesc(configName: 'agate.top-web.info', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'cp /opt/shoptrac/shoptrac /opt/shoptrac/shoptrac.bak && chmod 0775 /tmp/shoptrac && mv /tmp/shoptrac /opt/shoptrac/shoptrac && sudo systemctl restart shoptrac', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: 'shoptrac')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            steps {
+                sshPublisher(publishers: [sshPublisherDesc(configName: 'agate.top-web.info', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'cp /opt/shoptrac/shoptrac /opt/shoptrac/shoptrac.bak && chmod 0775 /tmp/shoptrac && mv /tmp/shoptrac /opt/shoptrac/shoptrac && sudo systemctl restart shoptrac', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: 'shoptrac')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            }
         }
     }
 }
