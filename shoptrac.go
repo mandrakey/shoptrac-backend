@@ -125,6 +125,22 @@ func runServe(ctx *cli.Context) error {
 			m.Post("/continue", handler.PostContinue)
 			m.Options("/*", handler.OptionsAuth)
 		})
+		m.Group("/users", func() {
+			m.Get("/", handler.UsersGet)
+			m.Get("/:uuid", handler.UsersGetUser)
+			m.Put("/", handler.UsersPut)
+			m.Patch("/", handler.UsersPatch)
+			m.Delete("/:uuid", handler.UsersDelete)
+			m.Options("/", handler.UsersOptions)
+			m.Options("/*", handler.UsersOptions)
+		})
+		m.Group("/profile", func() {
+			m.Get("/", handler.GetProfile)
+			m.Patch("/", handler.PatchProfile)
+			m.Post("/updatePassword", handler.PostProfileUpdatePassword)
+			m.Options("/", handler.OptionsProfile)
+			m.Options("/*", handler.OptionsProfile)
+		})
 		m.Get("/version", handler.GetVersion)
 	})
 

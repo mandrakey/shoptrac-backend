@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	AppVersion = "2020.1.0"
+	AppVersion = "1.2.0"
 
 	AccessAllow = 1
 	AccessDeny  = 0
@@ -40,6 +40,7 @@ type AppConfig struct {
 	Database                Database
 	SessionExpiry           int
 	SessionRememberMeExpiry int
+	PasswordCost            int
 }
 
 type Database struct {
@@ -84,6 +85,7 @@ func GetAppConfig() *AppConfig {
 			},
 			SessionExpiry:           30,           // 30 minutes
 			SessionRememberMeExpiry: 60 * 24 * 30, // 30 days
+			PasswordCost:            14,
 		}
 	}
 

@@ -27,6 +27,7 @@ type Session struct {
 	Expires           string `json:"expires"`
 	RememberMeToken   string `json:"remember_me_token"`
 	RememberMeExpires string `json:"remember_me_expires"`
+	User              *User  `json:"-"`
 }
 
 func NewSession(user *User) (*Session, error) {
@@ -36,6 +37,7 @@ func NewSession(user *User) (*Session, error) {
 
 	sess := Session{
 		UserKey: user.Key,
+		User:    user,
 	}
 
 	config := config.GetAppConfig()
@@ -47,7 +49,6 @@ func NewSession(user *User) (*Session, error) {
 }
 
 func GetSessionById(sessionId string) (*Session, error) {
-	//log := config.Logger()
 	db, err := GetDb()
 	if err != nil {
 		return nil, err
@@ -70,9 +71,16 @@ func GetSessionById(sessionId string) (*Session, error) {
 			return nil, nil
 		}
 		return nil, err
-	} else {
-		return &s, nil
 	}
+
+	// Add user data
+	user, err := GetUser(s.UserKey)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load session user: %s", err)
+	}
+	s.User = user
+
+	return &s, nil
 }
 
 func GetSessionWithToken(sessionId string, token string) (*Session, error) {
@@ -103,9 +111,16 @@ func GetSessionWithToken(sessionId string, token string) (*Session, error) {
 	} else if err != nil {
 		log.Errorf("Failed to read session data: %s", err)
 		return nil, err
-	} else {
-		return &s, nil
 	}
+
+	// Add user data
+	user, err := GetUser(s.UserKey)
+	if err != nil {
+		return nil, err
+	}
+	s.User = user
+
+	return &s, nil
 }
 
 func AddSession(session *Session) (string, error) {

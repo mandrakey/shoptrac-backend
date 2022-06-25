@@ -62,7 +62,7 @@ func GetActiveSession(ctx *macaron.Context) *repository.Session {
 		log := config.Logger()
 		sess, ok := ctx.Data[CONTEXT_KEY_SESSION].(*repository.Session)
 		if !ok {
-			log.Error("Failed to obtains Session from context.")
+			log.Error("Failed to obtain Session from context.")
 			return nil
 		} else {
 			return sess
