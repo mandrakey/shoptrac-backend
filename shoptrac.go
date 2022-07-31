@@ -11,6 +11,7 @@ import (
 	"github.com/mandrakey/shoptrac/config"
 	"github.com/mandrakey/shoptrac/handler"
 	"github.com/mandrakey/shoptrac/middleware"
+	"github.com/mandrakey/shoptrac/repository"
 )
 
 var (
@@ -67,12 +68,13 @@ func runServe(ctx *cli.Context) error {
 	config.SetupLogging(cfg.Logfile, cfg.Loglevel)
 	log := config.Logger()
 
-	// Prepare db if necessary
-	// log.Infof("Checking database collections ...")
-	// err = model.CheckAndCreateCollections(); if err != nil {
-	// 	log.Errorf("Failed to check/prepare database: %s", err)
-	// 	return err
-	// }
+	// Run migrations
+	err = repository.RunMigrations()
+	if err != nil {
+		err = fmt.Errorf("Failed to migrate database: %s", err)
+		log.Error(err)
+		return err
+	}
 
 	// Create server and set routing
 	m := macaron.Classic()
@@ -102,6 +104,15 @@ func runServe(ctx *cli.Context) error {
 
 			m.Options("/", handler.OptionsCategory)
 			m.Options("/*", handler.OptionsCategory)
+		})
+		m.Group("/shoppers", func() {
+			m.Get("/", handler.GetShoppers)
+			m.Put("/", handler.PutShoppers)
+			m.Patch("/:key", handler.PatchShoppers)
+			m.Delete("/:key", handler.DeleteShoppers)
+
+			m.Options("/", handler.OptionsShoppers)
+			m.Options("/*", handler.OptionsShoppers)
 		})
 		m.Group("/purchases", func() {
 			m.Get("/:year(\\d{4})/:month(\\d{1,2})", handler.GetPurchases)

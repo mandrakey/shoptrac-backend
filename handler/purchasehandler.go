@@ -81,6 +81,12 @@ func PutPurchase(ctx *macaron.Context) (int, string) {
 	}
 	purchase.Venue = venue
 
+	shopper, ok := data["shopper"].(string)
+	if !ok {
+		return 400, ErrorResponse("Parameter 'shopper' is required and must be a string")
+	}
+	purchase.Shopper = shopper
+
 	date, ok := data["date"].(string)
 	if !ok {
 		return 400, ErrorResponse("Parameter 'date' is required and must be a string")
@@ -163,6 +169,15 @@ func PostPurchase(ctx *macaron.Context) (int, string) {
 			return 400, ErrorResponse("The parameter 'venue' must be a string")
 		}
 		values["venue"] = venue
+	}
+
+	// shopper
+	if data["shopper"] != nil {
+		shopper, ok := data["shopper"].(string)
+		if !ok {
+			return 400, ErrorResponse("The parameter 'shopper' must be a string")
+		}
+		values["shopper"] = shopper
 	}
 
 	// date

@@ -15,6 +15,7 @@ type Purchase struct {
 	Key      string `json:"_key"`
 	Category string `json:"category"`
 	Venue    string `json:"venue"`
+	Shopper  string `json:"shopper"`
 	Date     string `json:"date"`
 	Month    int    `json:"month"`
 	Year     int    `json:"year"`
@@ -93,6 +94,31 @@ func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {
 	return &res, nil
 }
 
+func GetPurchasesCountForShopper(shopperKey string) (int, error) {
+	db, err := GetDb()
+	if err != nil {
+		return -1, err
+	}
+
+	c, err := db.Query(
+		ctx,
+		"FOR p IN purchases FILTER p.shopper == @shopperKey COLLECT WITH COUNT INTO cnt RETURN cnt",
+		map[string]interface{}{"shopperKey": shopperKey},
+	)
+	if err != nil {
+		return -1, fmt.Errorf("Failed to prepare query for counting purchases for given shopper: %s", err)
+	}
+	defer c.Close()
+
+	var cnt int
+	_, err = c.ReadDocument(ctx, &cnt)
+	if err != nil {
+		return -1, fmt.Errorf("Failed to read count from result set: %s", err)
+	}
+
+	return cnt, nil
+}
+
 func AddPurchase(purchase Purchase) (string, error) {
 	col, err := GetCollection(COLLECTION_PURCHASES)
 	if err != nil {
@@ -147,6 +173,9 @@ func validatePurchase(p *Purchase) error {
 	}
 	if p.Venue == "" {
 		return fmt.Errorf("Missing purchase venue")
+	}
+	if p.Shopper == "" {
+		return fmt.Errorf("Missing purchase shopper")
 	}
 	if p.Date == "" {
 		return fmt.Errorf("Missing purchase date")

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	arango "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
@@ -13,7 +14,8 @@ import (
 )
 
 const (
-	DATE_FORMAT = "2006-01-02"
+	DATE_FORMAT     = "2006-01-02"
+	DATETIME_FORMAT = "2006-01-02 15:04:05"
 )
 
 var (
@@ -117,4 +119,20 @@ func BuildFilterString(filters map[string]interface{}, prefix string) string {
 	}
 
 	return strings.Join(f, " AND ")
+}
+
+func DateFromDb(v string) (time.Time, error) {
+	return time.Parse(DATE_FORMAT, v)
+}
+
+func DateToDb(v time.Time) string {
+	return v.Format(DATE_FORMAT)
+}
+
+func DateTimeFromDb(v string) (time.Time, error) {
+	return time.Parse(DATETIME_FORMAT, v)
+}
+
+func DateTimeToDb(v time.Time) string {
+	return v.Format(DATETIME_FORMAT)
 }
