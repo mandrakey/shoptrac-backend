@@ -1,4 +1,6 @@
 /shoptrac
 /shoptrac.json
 /shoptrac.log
+/sonar-scanner.sh
+/.scannerwork
 /public
