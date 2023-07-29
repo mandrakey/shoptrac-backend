@@ -2,6 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/mandrakey/shoptrac/config"
@@ -104,4 +106,13 @@ func IsValidSession(ctx *macaron.Context) bool {
 	}
 
 	return true
+}
+
+func FormatSum(sum string) (string, error) {
+	f, err := strconv.ParseFloat(sum, 32)
+	if err != nil {
+		return sum, err
+	}
+
+	return fmt.Sprintf("%.2f", f), nil
 }

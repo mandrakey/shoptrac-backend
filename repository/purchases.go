@@ -49,7 +49,7 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 		_, err := c.ReadDocument(ctx, &p)
 
 		if p.Sum == "" {
-			p.Sum = "0.0"
+			p.Sum = "0.00"
 		}
 
 		if arango.IsNoMoreDocuments(err) {
@@ -62,6 +62,38 @@ func GetPurchases(month int, year int) (*[]Purchase, error) {
 	}
 
 	return &res, nil
+}
+
+func GetPurchase(key string) (*Purchase, error) {
+	db, err := GetDb()
+	if err != nil {
+		return nil, err
+	}
+
+	// ----
+	// Query database
+
+	c, err := db.Query(
+		ctx,
+		"FOR p IN purchases FILTER p._key == @key RETURN p",
+		map[string]interface{}{"key": key},
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+
+	var p Purchase
+	_, err = c.ReadDocument(ctx, &p)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.Sum == "" {
+		p.Sum = "0.00"
+	}
+
+	return &p, nil
 }
 
 func GetPurchaseTimestamps() (*[]PurchaseTimestamp, error) {

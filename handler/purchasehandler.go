@@ -113,7 +113,10 @@ func PutPurchase(ctx *macaron.Context) (int, string) {
 	if !ok {
 		return 400, ErrorResponse("Parameter 'sum' is required and must be a string")
 	}
-	purchase.Sum = sum
+	purchase.Sum, err = FormatSum(sum)
+	if err != nil {
+		return 500, ErrorResponse("Failed to format provided value for parameter 'sum'")
+	}
 
 	// ----
 	// Create purchase
@@ -217,7 +220,10 @@ func PostPurchase(ctx *macaron.Context) (int, string) {
 		if !ok {
 			return 400, ErrorResponse("The parameter 'sum' must be a string")
 		}
-		values["sum"] = sum
+		values["sum"], err = FormatSum(sum)
+		if err != nil {
+			return 500, ErrorResponse("Failed to format the value for parameter 'sum'")
+		}
 	}
 
 	// any data to update at all?
@@ -233,7 +239,12 @@ func PostPurchase(ctx *macaron.Context) (int, string) {
 		return 500, ErrorResponse(fmt.Sprintf("Failed to update purchase: %s", err))
 	}
 
-	return 200, SuccessResponse(nil)
+	purchase, err := repository.GetPurchase(key)
+	if err != nil {
+		return 200, SuccessResponse(nil)
+	}
+
+	return 200, SuccessResponse(purchase)
 }
 
 func DeletePurchase(ctx *macaron.Context) (int, string) {
