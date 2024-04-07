@@ -1,4 +1,7 @@
 = Shoptrac
+Maurice Bleuel <mandrakey@litir.de>
+Version 2024-04-07.1
+
 Shoptrac is a simple web application designed to track my costs of living by registering the total price spent whenever I went to the grocery store, or any other store I want to keep tabs on.
 
 It consists of a backend application (this repository) and a corresponding Vue.js frontend (https://github.com/mandrakey/shoptrac-frontend).
