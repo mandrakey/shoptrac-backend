@@ -1,0 +1,104 @@
+= Shoptrac
+Shoptrac is a simple web application designed to track my costs of living by registering the total price spent whenever I went to the grocery store, or any other store I want to keep tabs on.
+
+It consists of a backend application (this repository) and a corresponding Vue.js frontend (https://github.com/mandrakey/shoptrac-frontend).
+
+== Install
+The software is not officially provided with any package managers as far as I know, and there are no plans for me to do this. If you want to try Shoptrac for yourself, you will have to build the applications yourself.
+
+To build the backend application, thanks to Go being very easy to handle, you simply download a copy of the repository and issue `go build`. This will compile the source code to a file called `shoptrac` (or `shoptrac.exe` if you are on Windows). You then put a configuration file (see `shoptrac.json.dist` for examples) beside it and simply run `./shoptrac serve`.
+
+=== Prerequisistes
+Shoptrac uses ArangoDB (https://arangodb.com), an open source object database, for data storage. Install it, create a user/password and a database, and you should be fine - Shoptrac contains migrations logic to create necessary collections and base information on startup. I've never tried it on an empty database, but it should work.
+
+=== Configuration values explained
+
+.Example configuration
+[source,json]
+----
+{
+  "address": "127.0.0.1",
+  "loglevel": "debug",
+  "access-policy": {
+    "default": "deny",
+    "rules": [
+      {
+        "origin": "(127.0.0.1|\\[::1\\])",
+	    "policy": "allow"
+      }
+    ]
+  },
+  "database": {
+    "protocol": "http",
+    "host": "127.0.0.1",
+    "port": 8529,
+    "user": "user",
+    "password": "password",
+    "database": "shoptrac"
+  }
+}
+----
+
+The following values are understood:
+
+[options="header",cols="1,1,3a"]
+|====
+| Name | Default | Description
+
+| address
+| 0.0.0.0
+| The address to bind the server to / to listen on. Defaults to `127.0.0.1` unless specified otherwise.
+
+| loglevel
+| debug
+| Specify the granularity of the created logfile. For available loglevels see https://github.com/op/go-logging.
+
+| access-policy
+| -
+| Access policies are basically a miniature, unsafe version of a "firewall". They allow you to deny or allow usage of the API from certain addresses or address ranges - both IPv4 and IPv6 are supported. I use this to only allow my personal home IP to speak to the application hosted on my server.
+
+| access-policy.default
+| deny
+| The default policy for access if no rules match the remote IP address of the request. Can be `deny` or `allow`.
+
+| access-policy.rules
+| -
+| List of access policy rules. Each rule consists of a JSON object with two fields:
+
+origin:: The origin denotes the remote address this rule shall apply to, as a regular expression.
+policy:: The policy applied to all requsts coming from the any address matching _origin_.
+
+| database
+| -
+| Contains the configuration of the ArangoDB database to connect to.
+
+| database.protocol
+| http
+| The protocol to use when talking to ArangoDB. Defaults to `http`, intended to be used on development/test machines or on systems, where only local connections between program and database are in use.
+
+| database.host
+| 127.0.0.1
+| Hostname or IP address of the database server.
+
+| database.port
+| 8529
+| Port on the database server to connect to. Defaults to ArangoDB's default port.
+
+| database.user
+| -
+| Username to use when connecting to the database.
+
+| database.password
+| -
+| Password for the provided database username.
+
+| database.database
+| -
+| Name of the database inside ArangoDB to use.
+|====
+
+== Maintainers
+As this is a private project, created mostly for my personal benefit (and for fun, being able to use something else than Java and PostgreSQL for a change), it is really only maintained when I feel I need to change it, and when my spare time allows it. Feel free to create tickets, but I don't give any guarantee I'll even look at them in a timely fashion.
+
+== License
+The source code is licensed under BSD-3-Clause license, as can be found under link:LICENSES/BSD-3-Clause.txt[].

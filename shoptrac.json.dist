@@ -1,0 +1,21 @@
+{
+  "address": "127.0.0.1",
+  "loglevel": "debug",
+  "access-policy": {
+    "default": "deny",
+    "rules": [
+      {
+        "origin": "(127.0.0.1|\\[::1\\])",
+	"policy": "allow"
+      }
+    ]
+  },
+  "database": {
+    "protocol": "http",
+    "host": "127.0.0.1",
+    "port": 8529,
+    "user": "user",
+    "password": "password",
+    "database": "shoptrac"
+  }
+}

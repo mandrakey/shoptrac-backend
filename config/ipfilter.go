@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Maurice Bleuel <mandrakey@litir.de>
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 package config
 
 import (
@@ -9,15 +14,16 @@ import (
 
 var (
 	rxAddress = regexp.MustCompile("(\\S+):\\d+$")
-	allowed = make([]*regexp.Regexp, 0)
-	denied = make([]*regexp.Regexp, 0)
+	allowed   = make([]*regexp.Regexp, 0)
+	denied    = make([]*regexp.Regexp, 0)
 )
 
 func IpFilterer(c *AppConfig) macaron.Handler {
 	log := Logger()
 
-	for _, rule := range(c.AccessPolicy.Rules) {
-		rx, err := regexp.Compile(rule.Origin); if err != nil {
+	for _, rule := range c.AccessPolicy.Rules {
+		rx, err := regexp.Compile(rule.Origin)
+		if err != nil {
 			log.Warningf("Failed to parse access rule '%s'; skipping.", rule.Origin)
 			continue
 		}
@@ -53,7 +59,7 @@ func IpFilterer(c *AppConfig) macaron.Handler {
 func isValidIp(address string, ap *AccessPolicy) bool {
 	log := Logger()
 
-	for _, rx := range(denied) {
+	for _, rx := range denied {
 		log.Debugf("IPFILTER checking %s against %s", address, rx)
 		if rx.MatchString(address) {
 			log.Debug("... matched as denied")
@@ -61,7 +67,7 @@ func isValidIp(address string, ap *AccessPolicy) bool {
 		}
 	}
 
-	for _, rx := range(allowed) {
+	for _, rx := range allowed {
 		log.Debugf("IPFILTER checking %s against %s", address, rx)
 		if rx.MatchString(address) {
 			log.Debug("... matched as allowed")

@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Maurice Bleuel <mandrakey@litir.de>
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 package repository
 
 import (
@@ -12,20 +17,22 @@ const (
 )
 
 type Venue struct {
-	Key string `json:"_key"`
-	Name string `json:"name"`
+	Key   string `json:"_key"`
+	Name  string `json:"name"`
 	Image string `json:"image"`
 }
 
 func GetVenues() (*[]Venue, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return nil, err
 	}
 
 	// ----
 	// Query database
 
-	c, err := db.Query(ctx, "FOR v IN venues RETURN v", nil); if err != nil {
+	c, err := db.Query(ctx, "FOR v IN venues RETURN v", nil)
+	if err != nil {
 		return nil, err
 	}
 	defer c.Close()
@@ -48,7 +55,8 @@ func GetVenues() (*[]Venue, error) {
 }
 
 func AddVenue(name string, image string) (*Venue, error) {
-	col, err := GetCollection(COLLECTION_VENUES); if err != nil {
+	col, err := GetCollection(COLLECTION_VENUES)
+	if err != nil {
 		return nil, err
 	}
 
@@ -61,8 +69,9 @@ func AddVenue(name string, image string) (*Venue, error) {
 	}
 
 	// Create Venue and store
-	v := Venue{Key: fmt.Sprintf("%d", maxId + 1), Name: name, Image: image}
-	_, err = col.CreateDocument(ctx, v); if err != nil {
+	v := Venue{Key: fmt.Sprintf("%d", maxId+1), Name: name, Image: image}
+	_, err = col.CreateDocument(ctx, v)
+	if err != nil {
 		return nil, err
 	}
 
@@ -70,7 +79,8 @@ func AddVenue(name string, image string) (*Venue, error) {
 }
 
 func UpdateVenue(key string, data *map[string]interface{}) error {
-	col, err := GetCollection(COLLECTION_VENUES); if err != nil {
+	col, err := GetCollection(COLLECTION_VENUES)
+	if err != nil {
 		return err
 	}
 
@@ -79,7 +89,8 @@ func UpdateVenue(key string, data *map[string]interface{}) error {
 }
 
 func DeleteVenue(key string) error {
-	col, err := GetCollection(COLLECTION_VENUES); if err != nil {
+	col, err := GetCollection(COLLECTION_VENUES)
+	if err != nil {
 		return err
 	}
 
@@ -88,21 +99,25 @@ func DeleteVenue(key string) error {
 }
 
 func getMaxVenueIdInt() (int, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return -1, err
 	}
 
-	c, err := db.Query(ctx, "FOR v IN venues SORT v._key DESC LIMIT 1 RETURN v._key", nil); if err != nil {
+	c, err := db.Query(ctx, "FOR v IN venues SORT v._key DESC LIMIT 1 RETURN v._key", nil)
+	if err != nil {
 		return -1, err
 	}
 	defer c.Close()
 
 	var key string
-	_, err = c.ReadDocument(ctx, &key); if err != nil {
+	_, err = c.ReadDocument(ctx, &key)
+	if err != nil {
 		return -1, err
 	}
 
-	intkey, err := strconv.ParseInt(key, 10, 0); if err != nil {
+	intkey, err := strconv.ParseInt(key, 10, 0)
+	if err != nil {
 		return -1, err
 	}
 

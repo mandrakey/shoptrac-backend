@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Maurice Bleuel <mandrakey@litir.de>
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 package config
 
 import (
@@ -7,13 +12,14 @@ import (
 )
 
 var (
-	logger = logging.MustGetLogger("shoptrac")
+	logger    = logging.MustGetLogger("shoptrac")
 	logFormat = logging.MustStringFormatter("[%{time:2006-01-02 15:04:05}] %{level} %{message}")
 )
 
 func SetupLogging(logfile string, loglevel string) {
 	var backend logging.Backend
-	fp, _ := os.OpenFile(logfile, os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0644); if fp != nil {
+	fp, _ := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if fp != nil {
 		backend = logging.NewLogBackend(fp, "", 0)
 	} else {
 		backend = logging.NewLogBackend(os.Stdout, "", 0)

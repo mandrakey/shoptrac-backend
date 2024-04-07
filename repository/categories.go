@@ -1,3 +1,8 @@
+/*
+SPDX-FileCopyrightText: Maurice Bleuel <mandrakey@litir.de>
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 package repository
 
 import (
@@ -12,19 +17,21 @@ const (
 )
 
 type Category struct {
-	Key string `json:"_key"`
+	Key  string `json:"_key"`
 	Name string `json:"name"`
 }
 
 func GetCategories() (*[]Category, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return nil, err
 	}
 
 	// ----
 	// Query database
 
-	c, err := db.Query(ctx, "FOR c IN categories RETURN c", nil); if err != nil {
+	c, err := db.Query(ctx, "FOR c IN categories RETURN c", nil)
+	if err != nil {
 		return nil, err
 	}
 	defer c.Close()
@@ -47,7 +54,8 @@ func GetCategories() (*[]Category, error) {
 }
 
 func AddCategory(name string) (*Category, error) {
-	col, err := GetCollection(COLLECTION_CATEGORIES); if err != nil {
+	col, err := GetCollection(COLLECTION_CATEGORIES)
+	if err != nil {
 		return nil, err
 	}
 
@@ -60,8 +68,9 @@ func AddCategory(name string) (*Category, error) {
 	}
 
 	// Create new Category and store
-	cat := Category{Key: fmt.Sprintf("%d", maxId + 1), Name: name}
-	_, err = col.CreateDocument(ctx, cat); if err != nil {
+	cat := Category{Key: fmt.Sprintf("%d", maxId+1), Name: name}
+	_, err = col.CreateDocument(ctx, cat)
+	if err != nil {
 		return nil, err
 	}
 
@@ -69,7 +78,8 @@ func AddCategory(name string) (*Category, error) {
 }
 
 func UpdateCategory(key string, data *map[string]interface{}) error {
-	col, err := GetCollection(COLLECTION_CATEGORIES); if err != nil {
+	col, err := GetCollection(COLLECTION_CATEGORIES)
+	if err != nil {
 		return err
 	}
 
@@ -78,7 +88,8 @@ func UpdateCategory(key string, data *map[string]interface{}) error {
 }
 
 func DeleteCategory(key string) error {
-	col, err := GetCollection(COLLECTION_CATEGORIES); if err != nil {
+	col, err := GetCollection(COLLECTION_CATEGORIES)
+	if err != nil {
 		return err
 	}
 
@@ -87,21 +98,25 @@ func DeleteCategory(key string) error {
 }
 
 func getMaxCategoryIdInt() (int, error) {
-	db, err := GetDb(); if err != nil {
+	db, err := GetDb()
+	if err != nil {
 		return -1, err
 	}
 
-	c, err := db.Query(ctx, "FOR c IN categories SORT c._key DESC LIMIT 1 RETURN c._key", nil); if err != nil {
+	c, err := db.Query(ctx, "FOR c IN categories SORT c._key DESC LIMIT 1 RETURN c._key", nil)
+	if err != nil {
 		return -1, err
 	}
 	defer c.Close()
 
 	var key string
-	_, err = c.ReadDocument(ctx, &key); if err != nil {
+	_, err = c.ReadDocument(ctx, &key)
+	if err != nil {
 		return -1, err
 	}
 
-	intkey, err := strconv.ParseInt(key, 10, 0); if err != nil {
+	intkey, err := strconv.ParseInt(key, 10, 0)
+	if err != nil {
 		return -1, err
 	}
 
