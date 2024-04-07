@@ -6,6 +6,11 @@ Shoptrac is a simple web application designed to track my costs of living by reg
 
 It consists of a backend application (this repository) and a corresponding Vue.js frontend (https://github.com/mandrakey/shoptrac-frontend).
 
+The backend is built using the following technology:
+
+* Go
+* ArangoDB
+
 == Install
 The software is not officially provided with any package managers as far as I know, and there are no plans for me to do this. If you want to try Shoptrac for yourself, you will have to build the applications yourself.
 
