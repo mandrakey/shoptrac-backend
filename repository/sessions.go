@@ -48,7 +48,7 @@ func NewSession(user *User) (*Session, error) {
 	return &sess, nil
 }
 
-func GetSessionById(sessionId string) (*Session, error) {
+func GetUnexpiredSessionById(sessionId string) (*Session, error) {
 	db, err := GetDb()
 	if err != nil {
 		return nil, err

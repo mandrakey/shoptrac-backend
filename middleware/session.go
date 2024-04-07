@@ -15,7 +15,7 @@ func SessionMiddleware() macaron.Handler {
 		config := config.GetAppConfig()
 
 		sessionId := handler.ExtractSessionIdFromHeader(ctx)
-		sess, err := repository.GetSessionById(sessionId)
+		sess, err := repository.GetUnexpiredSessionById(sessionId)
 		if err != nil {
 			log.Errorf("Failed to load session: %s\r\n", err)
 			return
